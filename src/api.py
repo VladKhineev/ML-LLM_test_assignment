@@ -62,9 +62,9 @@ async def process_question(question_id: str):
     data = questions[question_id]
     try:
         text = parse_docx(files[data["file_id"]])
-        index = build_index(text)
+        index = await asyncio.to_thread(build_index, text)
         docs = retrieve(index, data["question"], text)
-        result = generate_answer(data["question"], docs)
+        result = await asyncio.to_thread(generate_answer, data["question"], docs)
         answers[question_id] = {"status": "done", "result": result}
     except Exception as e:
         answers[question_id] = {"status": "error", "detail": str(e)}
